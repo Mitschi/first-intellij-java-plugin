@@ -11,6 +11,11 @@
     <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html
          on how to target different products -->
     <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.idea.maven</depends>
+    <depends>com.intellij.java</depends>
+    <depends>com.intellij.modules.lang</depends>
+    <depends>org.jetbrains.plugins.yaml</depends>
+    <depends>com.intellij.properties</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
@@ -21,6 +26,12 @@
         <action id="com.github.mitschi.firstintellijplugin.actions.PopupDialogAction"
                 class="com.github.mitschi.firstintellijplugin.actions.PopupDialogAction" text="Pop Dialog Action"
                 description="Description of Pop Dialog Action">
+            <add-to-group group-id="ToolsMenu" anchor="first"/>
+            <!--            <add-to-group group-id="ToolbarRunGroup" anchor="last"/>-->
+        </action>
+        <action id="com.github.mitschi.firstintellijplugin.actions.MavenZeugsAction"
+                class="com.github.mitschi.firstintellijplugin.actions.MavenZeugsAction" text="Maven Action"
+                description="Description of Maven Action">
             <add-to-group group-id="ToolsMenu" anchor="first"/>
             <!--            <add-to-group group-id="ToolbarRunGroup" anchor="last"/>-->
         </action>

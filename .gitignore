@@ -255,3 +255,4 @@ gradle-app.setting
 **/build/
 
 # End of https://www.toptal.com/developers/gitignore/api/gradle,intellij,intellij+all,intellij+iml,maven
+/libs/

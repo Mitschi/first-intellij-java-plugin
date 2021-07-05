@@ -19,6 +19,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
+        <notificationGroup id="buildtools.notifications" displayType="STICKY_BALLOON" isLogByDefault="true"/>
     </extensions>
 
     <actions>

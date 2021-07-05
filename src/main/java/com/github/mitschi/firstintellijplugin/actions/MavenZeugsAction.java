@@ -3,8 +3,10 @@ package com.github.mitschi.firstintellijplugin.actions;
 import com.intellij.lang.xml.XMLLanguage;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
@@ -43,42 +45,12 @@ public class MavenZeugsAction extends AnAction implements DumbAware {
 
         final MavenProject mavenProject = manager.findProject(file);
         assert mavenProject != null;
-//
-//        System.out.println("TESTTEST");
-////
+
         VirtualFile virtualFile = mavenProject.getFile();
-//        File projectFile = MavenWslUtil.resolveWslAware(project,
-//                () -> new File(virtualFile.getPath()),
-//                wsl -> MavenWslUtil.getWslFile(wsl,new File(virtualFile.getPath())));
-//
-//        System.out.println(virtualFile);
-//        System.out.println(projectFile);
-//
+
         FileViewProvider fileViewProvider = PsiManager.getInstance(project).findViewProvider(virtualFile);
         PsiFile psiFile = fileViewProvider.getPsi(XMLLanguage.INSTANCE);
         XmlFile xmlFile = (XmlFile) psiFile;
-//
-//        System.out.println(xmlFile);
-//
-//        XmlTag[] dependencies = xmlFile.getRootTag().findSubTags("dependencies");
-//        System.out.println(dependencies.length);
-//
-//        XmlTag dependenciesTag = Arrays.stream(dependencies).findFirst().get();
-//
-//        XmlTag[] subTags = dependenciesTag.findSubTags("dependency");
-//        for (XmlTag dependencyTag : subTags) {
-//            XmlTag groupId = Arrays.stream(dependencyTag.findSubTags("groupId")).findFirst().get();
-//            XmlTag artifactId = Arrays.stream(dependencyTag.findSubTags("artifactId")).findFirst().get();
-//            XmlTag version = Arrays.stream(dependencyTag.findSubTags("version")).findFirst().get();
-//
-//            System.out.println("DEP: "+groupId.getValue().getText()+":"+artifactId.getValue().getText()+":"+version.getValue().getText());
-//
-//            PsiElement newTag = version.copy();
-////            newTag.
-//
-////            version.replace(newTag)
-//        }
-
         DomFileElement<MavenDomProjectModel> domFileElement = DomManager.getDomManager(project).getFileElement(xmlFile, MavenDomProjectModel.class);
 
         final MavenDomProjectModel rootElement = (MavenDomProjectModel) domFileElement.getRootElement();
@@ -86,34 +58,26 @@ public class MavenZeugsAction extends AnAction implements DumbAware {
 
         for (MavenDomDependency mavenDomDependency : mavenDomDependencies.getDependencies()) {
             System.out.println("ASDF");
-            mavenDomDependency.undefine();
+            System.out.println(mavenDomDependency);
+//            mavenDomDependency.getXmlTag().delete();
+//            mavenDomDependency.undefine();
+            XmlTag versionTag = Arrays.stream(mavenDomDependency.getXmlTag().findSubTags("version")).findFirst().get();
+            String oldVersion = versionTag.getText();
+//            Arrays.stream(mavenDomDependency.getXmlTag().findSubTags("version")).findFirst().get().delete();
+            System.out.println(versionTag);
+            versionTag.getValue().setText("3.7.2");
+            String newVersion = versionTag.getText();
+            System.out.println(versionTag);
 
+            final Notification notification = new Notification("buildtools.notifications", "",
+                    "Changed version from "+oldVersion+" to " +newVersion , NotificationType.INFORMATION);
+            ApplicationManager.getApplication().invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    Notifications.Bus.notify(notification, project);
+                }
+            });
         }
-
-
-//        manager.evaluateEffectivePom(mavenProject, s -> ApplicationManager.getApplication().invokeLater(() -> {
-//            if (project.isDisposed()) return;
-//
-//            if (s == null) { // null means UnsupportedOperationException
-//                new Notification(MavenUtil.MAVEN_NOTIFICATION_GROUP,
-//                        MavenProjectBundle.message("maven.effective.pom.failed.title"),
-//                        MavenProjectBundle.message("maven.effective.pom.failed"),
-//                        NotificationType.ERROR).notify(project);
-//                return;
-//            }
-//
-//            String fileName = mavenProject.getMavenId().getArtifactId() + "-effective-pom.xml";
-//            PsiFile file1 = PsiFileFactory.getInstance(project).createFileFromText(fileName, XMLLanguage.INSTANCE, s);
-//            try {
-//                file1.getVirtualFile().setWritable(false);
-//            }
-//            catch (IOException e) {
-//                LOG.error(e);
-//            }
-//
-//            file1.navigate(true);
-//        }));
-
 
     }
 
@@ -137,14 +101,27 @@ public class MavenZeugsAction extends AnAction implements DumbAware {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
+        // CommandProcessor for undo and formatting
         final Project project = MavenActionUtil.getProject(event.getDataContext());
-        if(project == null) return;
-        final VirtualFile file = findPomXml(event.getDataContext());
-        if (file == null) return;
+        CommandProcessor.getInstance().executeCommand(project, new Runnable() {
+            @Override
+            public void run() {
+                ApplicationManager.getApplication().runWriteAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        final Project project = MavenActionUtil.getProject(event.getDataContext());
+                        if(project == null) return;
+                        final VirtualFile file = findPomXml(event.getDataContext());
+                        if (file == null) return;
 
-        if (!MavenServerManager.getInstance().isUseMaven2()) {
-            actionPerformed(project, file);
-        }
+                        if (!MavenServerManager.getInstance().isUseMaven2()) {
+                            actionPerformed(project, file);
+                        }
+                    }
+                });
+            }
+        }, "Remove", "MavenRunHelper");
+
     }
 
 //    @Override

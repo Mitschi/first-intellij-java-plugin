@@ -20,6 +20,17 @@
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
         <notificationGroup id="buildtools.notifications" displayType="STICKY_BALLOON" isLogByDefault="true"/>
+        <toolWindow id="Sample Calendar" secondary="true" icon="AllIcons.General.Modified" anchor="right"
+                    factoryClass="com.github.mitschi.firstintellijplugin.windows.toolwindow.MyToolWindowFactory"/>
+
+        <localInspection language="JAVA"
+                         displayName="SDK: '==' or '!=' used instead of 'equals()'"
+                         groupPath="Java"
+                         groupBundle="messages.InspectionsBundle"
+                         groupKey="group.names.probable.bugs"
+                         enabledByDefault="true"
+                         level="WARNING"
+                         implementationClass="com.github.mitschi.firstintellijplugin.inspections.ComparingReferencesInspection"/>
     </extensions>
 
     <actions>
@@ -27,14 +38,14 @@
         <action id="com.github.mitschi.firstintellijplugin.actions.PopupDialogAction"
                 class="com.github.mitschi.firstintellijplugin.actions.PopupDialogAction" text="Pop Dialog Action"
                 description="Description of Pop Dialog Action">
-            <add-to-group group-id="ToolsMenu" anchor="first"/>
-            <!--            <add-to-group group-id="ToolbarRunGroup" anchor="last"/>-->
+<!--            <add-to-group group-id="ToolsMenu" anchor="first"/>-->
+                        <add-to-group group-id="ToolbarRunGroup" anchor="last"/>
         </action>
         <action id="com.github.mitschi.firstintellijplugin.actions.MavenZeugsAction"
                 class="com.github.mitschi.firstintellijplugin.actions.MavenZeugsAction" text="Maven Action"
                 description="Description of Maven Action">
-            <add-to-group group-id="ToolsMenu" anchor="first"/>
-            <!--            <add-to-group group-id="ToolbarRunGroup" anchor="last"/>-->
+<!--            <add-to-group group-id="ToolsMenu" anchor="first"/>-->
+                        <add-to-group group-id="ToolbarRunGroup" anchor="last"/>
         </action>
     </actions>
 </idea-plugin>

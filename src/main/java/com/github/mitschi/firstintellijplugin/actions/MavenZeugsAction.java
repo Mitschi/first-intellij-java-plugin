@@ -62,11 +62,11 @@ public class MavenZeugsAction extends AnAction implements DumbAware {
 //            mavenDomDependency.getXmlTag().delete();
 //            mavenDomDependency.undefine();
             XmlTag versionTag = Arrays.stream(mavenDomDependency.getXmlTag().findSubTags("version")).findFirst().get();
-            String oldVersion = versionTag.getText();
+            String oldVersion = versionTag.getValue().getText();
 //            Arrays.stream(mavenDomDependency.getXmlTag().findSubTags("version")).findFirst().get().delete();
             System.out.println(versionTag);
             versionTag.getValue().setText("3.7.2");
-            String newVersion = versionTag.getText();
+            String newVersion = versionTag.getValue().getText();
             System.out.println(versionTag);
 
             final Notification notification = new Notification("buildtools.notifications", "",
